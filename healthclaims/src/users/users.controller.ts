@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { UserService } from './users.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -16,11 +16,19 @@ export class UserController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    const user = await this.userService.validateUser(body.email, body.password);
-    if (!user) {
-      throw new Error('Invalid credentials');
+    console.log('Login Request Received:', body);
+
+    const user = await this.userService.findByEmail(body.email);
+
+    if (!user || user.password !== body.password) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-    const token = this.authService.generateToken({ id: user._id, role: user.role });
-    return { token };
+
+    console.log(`User Role: ${user.role}`);
+
+    const token = this.authService.generateToken({ email: user.email, role: user.role });
+    console.log('Returning Token:', token);
+
+    return { access_token: token };
   }
 }

@@ -25,7 +25,7 @@ export class CreateClaimDto {
   @IsEnum(['Pending', 'Approved', 'Rejected'])
   status?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsMongoId()
   patientId: string;
 

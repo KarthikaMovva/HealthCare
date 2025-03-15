@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-// import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon, EyeOffIcon, Mail, Lock } from "lucide-react";
 
@@ -9,53 +8,43 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("patient");
-//   const [mail, setMail] = useState("");
-//   const [patientId, setPatientId] = useState("");
+  const [patientId, setPatientId] = useState(null);
 
   const navigate = useNavigate();
 
-  // Function to fetch user ID
-//   const getUserId = async (userEmail) => {
-//     if (!userEmail) return;
-//     try {
-//       const response = await axios.post("http://localhost:3000/user/get-user-id", { email: userEmail });
-//       console.log("User ID:", response.data._id);
-//       setPatientId(response.data._id);
-//     } catch (error) {
-//       console.error("Error fetching user ID:", error.response?.data?.message || error.message);
-//     }
-//   };
+  const getUserId = async (userEmail) => {
+    try {
+      const response = await axios.post("http://localhost:3000/user/get-user-id", { email: userEmail });
+      setPatientId(response.data._id);
+    } catch (error) {
+      console.error("Error fetching user ID:", error.response?.data?.message || error.message);
+    }
+  };
 
-  // Effect to get user ID when mail state changes
-//   useEffect(() => {
-//     if (mail) {
-//       getUserId(mail);
-//     }
-//   }, [mail]);
-
-  // Handle login
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const response = await axios.post("http://localhost:3000/user/login", { email, password, role });
       localStorage.setItem("token", response.data.access_token);
       
-      if (role === "insurer") {
-        navigate("/all");
-      } else {
-        // const token = localStorage.getItem("token");
-        // const decodedToken = jwtDecode(token);
-        // setMail(decodedToken.email); 
-        navigate("/add");
-        alert("Login successfully!");
-        // navigate(`/all/${patientId}`)
-      }
+      await getUserId(email);
     } catch (error) {
       console.error("Login error:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Login failed. Please try again.");
     }
   };
+
+  useEffect(() => {
+    if (patientId) {
+      if (role === "insurer") {
+        navigate("/all");
+      } else {
+        navigate(`/all/${patientId}`);
+        alert("Login successfully!");
+      }
+    }
+  }, [patientId, role, navigate]);
 
   return (
     <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-700 shadow-xl">

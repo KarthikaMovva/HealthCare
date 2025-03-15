@@ -19,7 +19,7 @@ function App() {
       <Route path="/"  element={<Homepage/>}></Route>
       <Route path="/login" element={<LoginPage/>}></Route>
       <Route path="/signup" element={<SignupPage/>}></Route>
-      <Route path="/add" element={<AddClaim/>}></Route>
+      <Route path="/add/:patientId" element={<AddClaim/>}></Route>
       <Route path="/update/:id" element={<UpdateClaim/>}></Route>
       <Route path="/all" element={<AllClaims/>}></Route>
       <Route path="/all/:patientId" element={<SpecificAll/>}></Route>

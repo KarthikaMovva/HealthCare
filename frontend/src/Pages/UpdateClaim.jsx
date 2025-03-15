@@ -38,8 +38,6 @@ const UpdateClaim = () => {
       alert("No token found. Please log in again.");
       return;
     }
-  
-    // Debugging: Log formData before making request
     console.log("Submitting Form Data:", formData);
     console.log("Data Types:", {
       claimAmount: typeof formData.claimAmount,

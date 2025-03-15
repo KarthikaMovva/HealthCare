@@ -66,7 +66,6 @@ const ClaimsTable = () => {
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Claims List</h2>
 
         <div className="flex flex-wrap gap-4 justify-end mb-4">
-          {/* Status Filter */}
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -78,7 +77,6 @@ const ClaimsTable = () => {
             <option value="Pending">Pending</option>
           </select>
 
-          {/* Claim Amount Filter */}
           <input
             type="number"
             placeholder="Min Claim Amount"
@@ -87,7 +85,6 @@ const ClaimsTable = () => {
             className="border border-gray-300 p-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          {/* Submission Date Filter */}
           <input
             type="date"
             value={submissionDateFilter}

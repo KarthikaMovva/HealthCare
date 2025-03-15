@@ -57,4 +57,12 @@ updateClaim(@Param('id') id: string, @Body() updateClaimDto: CreateClaimDto) {
 deleteClaim(@Param('id') id: string) {
   return this.claimsService.delete(id);
 }
+
+@Get('/patient/:patientId')
+@UseGuards(RolesGuard)
+@Roles('patient')
+getClaimsByPatientId(@Param('patientId') patientId: string) {
+  return this.claimsService.findByPatientId(patientId);
+}
+
 }

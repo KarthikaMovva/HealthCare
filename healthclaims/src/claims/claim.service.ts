@@ -41,4 +41,8 @@ export class ClaimsService {
     }
     return { message: 'Claim deleted successfully' };
   }
+
+  async findByPatientId(patientId: string) {
+    return this.claimModel.find({ patientId }).exec();
+  }
 }

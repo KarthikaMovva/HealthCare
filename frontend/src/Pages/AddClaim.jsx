@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dg6izvre4/upload";
 const UPLOAD_PRESET = "unsigned_upload";
 
 const AddClaim = () => {
+  const { patientId } = useParams(); 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,8 +18,9 @@ const AddClaim = () => {
     insurerComments: "",
   });
 
-  const [file, setFile] = useState(null); // State for file upload
+  const [file, setFile] = useState(null);
   const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -41,6 +43,10 @@ const AddClaim = () => {
       alert("No token found. Please log in again.");
       return;
     }
+    if (!/^[a-fA-F0-9]{24}$/.test(patientId)) {
+      alert("Invalid Patient ID");
+      return;
+    }
 
     try {
       let uploadedUrl = "";
@@ -50,10 +56,14 @@ const AddClaim = () => {
         uploadData.append("upload_preset", UPLOAD_PRESET);
 
         const cloudinaryResponse = await axios.post(CLOUDINARY_URL, uploadData);
-        uploadedUrl = cloudinaryResponse.data.secure_url; 
+        uploadedUrl = cloudinaryResponse.data.secure_url;
       }
 
-      const finalData = { ...formData, documentUrl: uploadedUrl };
+      const finalData = {
+        ...formData,
+        documentUrl: uploadedUrl,
+        patientId, 
+      };
 
       const response = await axios.post(
         "http://localhost:3000/claims/post",
@@ -68,7 +78,7 @@ const AddClaim = () => {
 
       console.log("Claim added successfully:", response.data);
       alert("Claim added successfully!");
-      navigate("/");
+      navigate(`/all/${patientId}`);
     } catch (error) {
       console.error("Error adding claim:", error.response?.data || error.message);
       alert(`Error: ${JSON.stringify(error.response?.data, null, 2)}`);

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+// import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon, EyeOffIcon, Mail, Lock } from "lucide-react";
 
@@ -7,25 +8,52 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState("Patient");
-  const NextPage=useNavigate();
-  
+  const [role, setRole] = useState("patient");
+//   const [mail, setMail] = useState("");
+//   const [patientId, setPatientId] = useState("");
+
+  const navigate = useNavigate();
+
+  // Function to fetch user ID
+//   const getUserId = async (userEmail) => {
+//     if (!userEmail) return;
+//     try {
+//       const response = await axios.post("http://localhost:3000/user/get-user-id", { email: userEmail });
+//       console.log("User ID:", response.data._id);
+//       setPatientId(response.data._id);
+//     } catch (error) {
+//       console.error("Error fetching user ID:", error.response?.data?.message || error.message);
+//     }
+//   };
+
+  // Effect to get user ID when mail state changes
+//   useEffect(() => {
+//     if (mail) {
+//       getUserId(mail);
+//     }
+//   }, [mail]);
+
+  // Handle login
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
-      const response = await axios.post('http://localhost:3000/user/login',{email,password,role});
-      localStorage.setItem("token",response.data.access_token)
-
-      if(role=='insurer'){
-        NextPage("/all")
-      }else{
-        NextPage("/add")
+      const response = await axios.post("http://localhost:3000/user/login", { email, password, role });
+      localStorage.setItem("token", response.data.access_token);
+      
+      if (role === "insurer") {
+        navigate("/all");
+      } else {
+        // const token = localStorage.getItem("token");
+        // const decodedToken = jwtDecode(token);
+        // setMail(decodedToken.email); 
+        navigate("/add");
+        alert("Login successfully!");
+        // navigate(`/all/${patientId}`)
       }
-      alert('Login successfully!');
     } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
-      alert(error.response?.data?.message || 'Login failed. Please try again.');
+      console.error("Login error:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Login failed. Please try again.");
     }
   };
 
@@ -37,7 +65,7 @@ export function LoginPage() {
           Enter your email, password, and role to access your account
         </p>
       </div>
-      
+
       <div className="p-6 pt-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -59,7 +87,7 @@ export function LoginPage() {
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label htmlFor="password" className="block text-sm font-medium text-blue-700 dark:text-blue-300">
@@ -91,6 +119,7 @@ export function LoginPage() {
               </button>
             </div>
           </div>
+
           <div className="space-y-2">
             <label htmlFor="role" className="block text-sm font-medium text-blue-700 dark:text-blue-300">
               Which role would you prefer?
@@ -105,7 +134,7 @@ export function LoginPage() {
               <option value="insurer">Insurer</option>
             </select>
           </div>
-          
+
           <button 
             type="submit" 
             className="w-full h-10 px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
@@ -113,7 +142,7 @@ export function LoginPage() {
             Sign In
           </button>
         </form>
-        
+
         <div className="text-center text-sm text-blue-600 dark:text-blue-400 mt-6">
           Don't have an account?{" "}
           <a href="/signup" className="font-medium text-green-600 hover:text-green-500 dark:text-green-400 dark:hover:text-green-300 hover:underline">
@@ -124,4 +153,5 @@ export function LoginPage() {
     </div>
   );
 }
+
 export default LoginPage;

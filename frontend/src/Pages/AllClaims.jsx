@@ -6,6 +6,8 @@ const ClaimsTable = () => {
   const [claims, setClaims] = useState([]);
   const [filteredClaims, setFilteredClaims] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const [claimAmountFilter, setClaimAmountFilter] = useState("");
+  const [submissionDateFilter, setSubmissionDateFilter] = useState("");
   const Navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +21,7 @@ const ClaimsTable = () => {
       })
       .then((response) => {
         setClaims(response.data);
-        setFilteredClaims(response.data); 
+        setFilteredClaims(response.data);
       })
       .catch((error) => {
         console.error("Error fetching claims:", error);
@@ -27,13 +29,25 @@ const ClaimsTable = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedStatus === "All") {
-      setFilteredClaims(claims);
-    } else {
-      const filtered = claims.filter((claim) => claim.status === selectedStatus);
-      setFilteredClaims(filtered);
+    let filtered = claims;
+
+    if (selectedStatus !== "All") {
+      filtered = filtered.filter((claim) => claim.status === selectedStatus);
     }
-  }, [selectedStatus, claims]);
+
+    if (claimAmountFilter) {
+      filtered = filtered.filter((claim) => claim.claimAmount >= claimAmountFilter);
+    }
+
+    if (submissionDateFilter) {
+        filtered = filtered.filter((claim) => {
+            const submissionDate = new Date(claim.createdAt).toISOString().split("T")[0]; 
+            return submissionDate === submissionDateFilter;
+          });
+    }
+
+    setFilteredClaims(filtered);
+  }, [selectedStatus, claimAmountFilter, submissionDateFilter, claims]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -48,10 +62,11 @@ const ClaimsTable = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-green-50 p-6">
-      <div className="w-full max-w-5xl bg-white shadow-lg rounded-2xl p-6">
+      <div className="w-full max-w-6xl bg-white shadow-lg rounded-2xl p-6">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Claims List</h2>
 
-        <div className="flex justify-end mb-4">
+        <div className="flex flex-wrap gap-4 justify-end mb-4">
+          {/* Status Filter */}
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -62,6 +77,23 @@ const ClaimsTable = () => {
             <option value="Rejected">Rejected</option>
             <option value="Pending">Pending</option>
           </select>
+
+          {/* Claim Amount Filter */}
+          <input
+            type="number"
+            placeholder="Min Claim Amount"
+            value={claimAmountFilter}
+            onChange={(e) => setClaimAmountFilter(e.target.value)}
+            className="border border-gray-300 p-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          {/* Submission Date Filter */}
+          <input
+            type="date"
+            value={submissionDateFilter}
+            onChange={(e) => setSubmissionDateFilter(e.target.value)}
+            className="border border-gray-300 p-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <div className="overflow-x-auto">
@@ -71,9 +103,12 @@ const ClaimsTable = () => {
                 <th className="p-3">Name</th>
                 <th className="p-3">Email</th>
                 <th className="p-3">Claim Amount</th>
+                <th className="p-3">Submission Date</th>
                 <th className="p-3">Description</th>
                 <th className="p-3">Document</th>
                 <th className="p-3">Status</th>
+                <th className="p-3">Approved Amount</th>
+                <th className="p-3">Insurer Comments</th>
                 <th className="p-3">Actions</th>
               </tr>
             </thead>
@@ -84,11 +119,18 @@ const ClaimsTable = () => {
                     <td className="p-3 text-center">{claim.name}</td>
                     <td className="p-3 text-center">{claim.email}</td>
                     <td className="p-3 text-center">${claim.claimAmount}</td>
+                    <td className="p-3 text-center">
+  {claim.createdAt ? new Date(claim.createdAt).toLocaleDateString() : "N/A"}
+</td>
                     <td className="p-3 text-center">{claim.description}</td>
-                    <td className="p-3 text-center">{claim.documentUrl}</td>
+                    <td className="p-3 text-center">
+                      <img src={claim.documentUrl} alt="Document" className="w-16 h-16 object-cover rounded-lg" />
+                    </td>
                     <td className={`p-3 text-center border rounded-lg ${getStatusColor(claim.status)}`}>
                       {claim.status}
                     </td>
+                    <td className="p-3 text-center">{claim.approvedAmount}</td>
+                    <td className="p-3 text-center">{claim.insurerComments}</td>
                     <td className="p-3 text-center">
                       <button
                         onClick={() => Navigate(`/update/${claim._id}`, { state: { ...claim, patientId: claim.patientId } })}
@@ -102,8 +144,8 @@ const ClaimsTable = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="text-center text-red-500 p-4 font-semibold">
-                    No claims found with the status "{selectedStatus}"
+                  <td colSpan="10" className="text-center text-red-500 p-4 font-semibold">
+                    No details are present for the selected filters.
                   </td>
                 </tr>
               )}

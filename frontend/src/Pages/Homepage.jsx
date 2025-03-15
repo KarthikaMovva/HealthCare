@@ -14,7 +14,7 @@ const Homepage = () => {
             Get the best medical insurance plans tailored to your needs. 
             Secure your health, secure your future.
           </p>
-          <a href="/plans" className="mt-6 inline-block bg-gradient-to-r from-blue-500 to-green-500 
+          <a className="mt-6 inline-block bg-gradient-to-r from-blue-500 to-green-500 
                                      text-white font-semibold text-lg px-8 py-3 rounded-lg 
                                      hover:shadow-lg transition duration-300">
             Explore Plans

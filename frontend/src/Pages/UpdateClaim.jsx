@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 
@@ -7,6 +7,7 @@ const UpdateClaim = () => {
   const { id } = useParams(); 
   const location = useLocation();
   const claim = location.state || {};
+  const next=useNavigate();
 
   const [formData, setFormData] = useState({
     name: claim.name,
@@ -59,6 +60,7 @@ const UpdateClaim = () => {
   
       console.log("Claim updated successfully:", response.data);
       alert("Claim updated successfully!");
+      next("/all");
     } catch (error) {
       console.error("Error updating claim:", error.response?.data || error.message);
       alert(`Error: ${JSON.stringify(error.response?.data, null, 2)}`);
@@ -89,11 +91,10 @@ const UpdateClaim = () => {
           Description:
           <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-2 border rounded"></textarea>
         </label>
-
-        <label className="block mb-2">
+<label className="block mb-2">
           Document URL:
-          <input type="text" name="documentUrl" value={formData.documentUrl} onChange={handleChange} className="w-full p-2 border rounded" />
-        </label>
+          <img src={formData.documentUrl} alt={formData.documentUrl} />
+        </label> 
 
         <label className="block mb-2">
           Status:

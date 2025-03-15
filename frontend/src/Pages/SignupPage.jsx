@@ -7,7 +7,7 @@ const SignupPage = () => {
     name: '',
     email: '',
     password: '',
-    role: 'Patient',
+    role: 'patient',
   });
   const NextPage=useNavigate();
 
